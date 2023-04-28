@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"goCraw/config"
-	"goCraw/domain"
+	"goCraw/model"
 	"io"
 	"net/http"
 	"os"
@@ -29,7 +29,7 @@ func (a azurLaneService) CrawWallpaper() error {
 		return err
 	}
 
-	var resApi domain.ResponseApi
+	var resApi model.ResponseApi
 	if err = json.Unmarshal([]byte(resBody), &resApi); err != nil {
 		return err
 	}

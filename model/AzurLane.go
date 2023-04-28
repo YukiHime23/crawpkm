@@ -1,4 +1,4 @@
-package domain
+package model
 
 type ResponseApi struct {
 	StatusCode int     `json:"statusCode"`

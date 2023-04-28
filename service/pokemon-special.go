@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/gocolly/colly"
 	"goCraw/config"
-	"goCraw/domain"
+	"goCraw/model"
 	"os"
 	"strings"
 )
 
 type PokemonSpecialService interface {
-	CrawVolume(nextVolume string, volume domain.Volume) error
+	CrawVolume(nextVolume string, volume model.Volume) error
 }
 
 type pokemonSpecialService struct {
@@ -20,8 +20,8 @@ var collectorPKM = colly.NewCollector(
 	colly.AllowedDomains(config.DomainPkm),
 )
 
-func (p pokemonSpecialService) CrawVolume(nextVolume string, vol domain.Volume) error {
-	c := domain.Chapter{}
+func (p pokemonSpecialService) CrawVolume(nextVolume string, vol model.Volume) error {
+	c := model.Chapter{}
 	collectorPKM.OnHTML("#Blog1_blog-pager-newer-link", func(element *colly.HTMLElement) {
 		nextVolume = element.Attr("href")
 	})
@@ -54,7 +54,7 @@ func (p pokemonSpecialService) CrawVolume(nextVolume string, vol domain.Volume) 
 	return nil
 }
 
-func (p pokemonSpecialService) CrawChapter(chapter *domain.Chapter) (error, string) {
+func (p pokemonSpecialService) CrawChapter(chapter *model.Chapter) (error, string) {
 	if err := os.MkdirAll(config.PathPkm+chapter.Title, os.ModePerm); err != nil {
 		return err, err.Error()
 	}
@@ -68,7 +68,7 @@ func (p pokemonSpecialService) CrawChapter(chapter *domain.Chapter) (error, stri
 	return nil, "craw -> " + chapter.Title + " <- done!"
 }
 
-func (p pokemonSpecialService) GetPageLink(c *domain.Chapter, linkPage string) error {
+func (p pokemonSpecialService) GetPageLink(c *model.Chapter, linkPage string) error {
 	collectorPKM.OnHTML("h3.post-title", func(element *colly.HTMLElement) {
 		t := strings.Trim(element.Text, "\n")
 		c.Title = t

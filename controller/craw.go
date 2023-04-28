@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"goCraw/config"
-	"goCraw/domain"
+	"goCraw/model"
 	"goCraw/service"
 	"net/http"
 )
@@ -21,7 +21,7 @@ func NewCrawController() *CrawController {
 }
 
 func (c *CrawController) CrawPkmSpecial(ctx *gin.Context) {
-	vol := domain.Volume{}
+	vol := model.Volume{}
 	err := c.Pkm.CrawVolume(config.LinkPkmCraw, vol)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -40,6 +40,6 @@ func (c *CrawController) CrawAzurLaneWallpaper(ctx *gin.Context) {
 		})
 		return
 	}
-	
+
 	return
 }
