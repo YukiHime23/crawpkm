@@ -2,11 +2,20 @@ package service
 
 import (
 	"errors"
+	"gorm.io/gorm"
 	"io"
 	"net/http"
 	"os"
 	"path"
 )
+
+type AppService struct {
+	db *gorm.DB
+}
+
+func NewAppService(db *gorm.DB) *AppService {
+	return &AppService{db: db}
+}
 
 func DownloadFile(URL, fileName string, pathTo string) error {
 	//Get the response bytes from the url

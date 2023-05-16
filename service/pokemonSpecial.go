@@ -13,14 +13,11 @@ type PokemonSpecialService interface {
 	CrawVolume(nextVolume string, volume model.Volume) error
 }
 
-type pokemonSpecialService struct {
-}
-
 var collectorPKM = colly.NewCollector(
 	colly.AllowedDomains(config.DomainPkm),
 )
 
-func (p pokemonSpecialService) CrawVolume(nextVolume string, vol model.Volume) error {
+func (a AppService) CrawVolume(nextVolume string, vol model.Volume) error {
 	c := model.Chapter{}
 	collectorPKM.OnHTML("#Blog1_blog-pager-newer-link", func(element *colly.HTMLElement) {
 		nextVolume = element.Attr("href")
@@ -48,13 +45,13 @@ func (p pokemonSpecialService) CrawVolume(nextVolume string, vol model.Volume) e
 
 	fmt.Println(c.Title)
 	vol.ChapLink = append(vol.ChapLink, c)
-	p.CrawChapter(&c)
-	defer p.CrawVolume(nextVolume, vol)
+	a.CrawChapter(&c)
+	defer a.CrawVolume(nextVolume, vol)
 
 	return nil
 }
 
-func (p pokemonSpecialService) CrawChapter(chapter *model.Chapter) (error, string) {
+func (a AppService) CrawChapter(chapter *model.Chapter) (error, string) {
 	if err := os.MkdirAll(config.PathPkm+chapter.Title, os.ModePerm); err != nil {
 		return err, err.Error()
 	}
@@ -68,7 +65,7 @@ func (p pokemonSpecialService) CrawChapter(chapter *model.Chapter) (error, strin
 	return nil, "craw -> " + chapter.Title + " <- done!"
 }
 
-func (p pokemonSpecialService) GetPageLink(c *model.Chapter, linkPage string) error {
+func (a AppService) GetPageLink(c *model.Chapter, linkPage string) error {
 	collectorPKM.OnHTML("h3.post-title", func(element *colly.HTMLElement) {
 		t := strings.Trim(element.Text, "\n")
 		c.Title = t
@@ -83,8 +80,4 @@ func (p pokemonSpecialService) GetPageLink(c *model.Chapter, linkPage string) er
 	}
 
 	return nil
-}
-
-func NewPokemonSpecialService() PokemonSpecialService {
-	return &pokemonSpecialService{}
 }

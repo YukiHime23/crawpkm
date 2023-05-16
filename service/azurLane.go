@@ -15,10 +15,7 @@ type AzurLaneService interface {
 	CrawWallpaper() error
 }
 
-type azurLaneService struct {
-}
-
-func (a azurLaneService) CrawWallpaper() error {
+func (a AppService) CrawWallpaper() error {
 	res, err := http.Get(config.ApiListWallpaperAzurLane)
 	if err != nil {
 		return err
@@ -30,7 +27,7 @@ func (a azurLaneService) CrawWallpaper() error {
 	}
 
 	var resApi model.ResponseApi
-	if err = json.Unmarshal([]byte(resBody), &resApi); err != nil {
+	if err = json.Unmarshal(resBody, &resApi); err != nil {
 		return err
 	}
 
@@ -50,8 +47,4 @@ func (a azurLaneService) CrawWallpaper() error {
 		fmt.Println("-> download done \"" + fileName + "\" <-")
 	}
 	return nil
-}
-
-func NewAzurLaneService() AzurLaneService {
-	return &azurLaneService{}
 }

@@ -3,20 +3,33 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"goCraw/controller"
+	"goCraw/database"
+	"goCraw/service"
+	"log"
 	"net/http"
 )
 
 func main() {
 	router := gin.Default()
 
-	crawCtrl := controller.NewCrawController()
+	db, err := database.OpenPostgresDB()
+	if err != nil {
+		log.Fatal("[main] DB connect error: ", err)
+	}
+
+	ser := service.NewAppService(db)
+
+	crawALCtrl := controller.NewCrawALController(ser)
+	router.GET("/wallpaper/azur-lane", crawALCtrl.CrawAzurLaneWallpaper)
+
 	router.GET("/check-heath", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Oke",
 		})
 	})
-	router.GET("/craw-data/pokemon-special", crawCtrl.CrawPkmSpecial)
-	router.GET("/wallpaper/azur-lane", crawCtrl.CrawAzurLaneWallpaper)
+
+	crawPKCtrl := controller.NewCrawPKController(ser)
+	router.GET("/craw-data/pokemon-special", crawPKCtrl.CrawPkmSpecial)
 
 	router.Run(":8080")
 }
