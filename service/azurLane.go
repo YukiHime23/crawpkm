@@ -35,13 +35,13 @@ func (a AppService) CrawWallpaper() error {
 		return err
 	}
 
-	var list []model.AzurLane
 	var idExist []int
 
 	// get id exist
 	a.db.Select("id_wallpaper").Table("azur_lanes").Scan(&idExist)
 
 	for _, row := range resApi.Data.Rows {
+
 		if IntInArray(idExist, row.ID) {
 			continue
 		}
@@ -53,10 +53,7 @@ func (a AppService) CrawWallpaper() error {
 		if err = DownloadFile(al.Url, al.FileName, pathFile); err != nil {
 			return err
 		}
-		list = append(list, al)
-	}
-	if len(list) > 0 {
-		a.db.Create(&list)
+		a.db.Create(&al)
 	}
 	return nil
 }
