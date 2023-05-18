@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 	"io"
 	"net/http"
@@ -18,6 +19,8 @@ func NewAppService(db *gorm.DB) *AppService {
 }
 
 func DownloadFile(URL, fileName string, pathTo string) error {
+	fmt.Println("-> Start download <-")
+
 	//Get the response bytes from the url
 	response, err := http.Get(URL)
 	if err != nil {
@@ -46,5 +49,15 @@ func DownloadFile(URL, fileName string, pathTo string) error {
 		return err
 	}
 
+	fmt.Println("-> download done \"" + fileName + "\" <-")
 	return nil
+}
+
+func IntInArray(arr []int, str int) bool {
+	for _, a := range arr {
+		if a == str {
+			return true
+		}
+	}
+	return false
 }

@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"goCraw/config"
 	"goCraw/model"
 	"io"
@@ -36,15 +35,28 @@ func (a AppService) CrawWallpaper() error {
 		return err
 	}
 
-	// 95 file
+	var list []model.AzurLane
+	var idExist []int
+
+	// get id exist
+	a.db.Select("id_wallpaper").Table("azur_lanes").Scan(&idExist)
+
 	for _, row := range resApi.Data.Rows {
-		fmt.Println("-> Start download <-")
-		urlWall := config.DomainLoadWallpaperAzurLane + row.Works
-		fileName := strings.ReplaceAll(row.Title+" ("+row.Artist+").jpeg", "/", "-")
-		if err = DownloadFile(urlWall, fileName, pathFile); err != nil {
+		if IntInArray(idExist, row.ID) {
+			continue
+		}
+
+		var al model.AzurLane
+		al.Url = config.DomainLoadWallpaperAzurLane + row.Works
+		al.FileName = strings.ReplaceAll(row.Title+" ("+row.Artist+").jpeg", "/", "-")
+		al.IdWallpaper = row.ID
+		if err = DownloadFile(al.Url, al.FileName, pathFile); err != nil {
 			return err
 		}
-		fmt.Println("-> download done \"" + fileName + "\" <-")
+		list = append(list, al)
+	}
+	if len(list) > 0 {
+		a.db.Create(&list)
 	}
 	return nil
 }

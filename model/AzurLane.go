@@ -21,3 +21,9 @@ type Wallpaper struct {
 	PublishTime int    `json:"publish_time"`
 	New         bool   `json:"new"`
 }
+
+type AzurLane struct {
+	FileName    string `json:"file_name"`
+	IdWallpaper int    `json:"id_wallpaper"`
+	Url         string `json:"url"`
+}

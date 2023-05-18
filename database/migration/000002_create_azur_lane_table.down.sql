@@ -1,1 +1,1 @@
-DROP TABLE azur_lane
+DROP TABLE azur_lanes
