@@ -22,6 +22,9 @@ func main() {
 	crawALCtrl := controller.NewCrawALController(ser)
 	router.GET("/wallpaper/azur-lane", crawALCtrl.CrawAzurLaneWallpaper)
 
+	crawBookVnCtrl := controller.NewCrawBookVnController(ser)
+	router.GET("/book-vn", crawBookVnCtrl.CrawCXB)
+
 	router.GET("/check-heath", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Oke",

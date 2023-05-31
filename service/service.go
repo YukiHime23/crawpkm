@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 )
 
 type AppService struct {
@@ -60,4 +61,10 @@ func IntInArray(arr []int, str int) bool {
 		}
 	}
 	return false
+}
+
+func parseDateStringDDMMYYYY(dateStr string) (time.Time, error) {
+	layout := "02/01/2006" // Bố cục đại diện cho định dạng chuỗi
+
+	return time.Parse(layout, dateStr)
 }
