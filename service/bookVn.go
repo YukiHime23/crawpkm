@@ -2,12 +2,13 @@ package service
 
 import (
 	"fmt"
-	"goCraw/model"
 	"log"
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/YukiHime23/craw-pkm/model"
 	"github.com/gocolly/colly"
 )
 
@@ -15,7 +16,13 @@ type BookVnService interface {
 	CrawBookVn() any
 }
 
-func (a AppService) CrawBookVn() any {
+func parseDateStringDDMMYYYY(dateStr string) (time.Time, error) {
+	layout := "02/01/2006" // Bố cục đại diện cho định dạng chuỗi
+
+	return time.Parse(layout, dateStr)
+}
+
+func CrawBookVn() any {
 
 	// Tạo một Collector mới
 	c := colly.NewCollector()
@@ -71,7 +78,7 @@ func (a AppService) CrawBookVn() any {
 	}
 
 	// Lưu thông tin sách
-	a.db.Create(books)
+	// a.db.Create(books)
 	return books
 }
 

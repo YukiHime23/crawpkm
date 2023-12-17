@@ -1,23 +1,13 @@
-package service
+package craw_pkm
 
 import (
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"io"
 	"net/http"
 	"os"
 	"path"
-	"time"
 )
-
-type AppService struct {
-	db *gorm.DB
-}
-
-func NewAppService(db *gorm.DB) *AppService {
-	return &AppService{db: db}
-}
 
 func DownloadFile(URL, fileName string, pathTo string) error {
 	fmt.Println("-> Start download <-")
@@ -61,10 +51,4 @@ func IntInArray(arr []int, str int) bool {
 		}
 	}
 	return false
-}
-
-func parseDateStringDDMMYYYY(dateStr string) (time.Time, error) {
-	layout := "02/01/2006" // Bố cục đại diện cho định dạng chuỗi
-
-	return time.Parse(layout, dateStr)
 }

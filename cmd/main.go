@@ -1,23 +1,30 @@
-package service
+package main
 
 import (
 	"fmt"
-	"github.com/gocolly/colly"
-	"goCraw/config"
-	"goCraw/model"
 	"os"
 	"strings"
+
+	craw_pkm "github.com/YukiHime23/craw-pkm"
+	"github.com/YukiHime23/craw-pkm/model"
+	"github.com/gocolly/colly"
 )
 
-type PokemonSpecialService interface {
-	CrawVolume(nextVolume string, volume model.Volume) error
+func main() {
+
 }
 
-var collectorPKM = colly.NewCollector(
-	colly.AllowedDomains(config.DomainPkm),
+var (
+	PathPkm     = "Pokemon/"
+	DomainPkm   = "www.pokemonspecial.com"
+	LinkPkmCraw = "https://www.pokemonspecial.com/2013/12/chapter-001.html"
 )
 
-func (a AppService) CrawVolume(nextVolume string, vol model.Volume) error {
+var collectorPKM = colly.NewCollector(
+	colly.AllowedDomains(DomainPkm),
+)
+
+func CrawVolume(nextVolume string, vol model.Volume) error {
 	c := model.Chapter{}
 	collectorPKM.OnHTML("#Blog1_blog-pager-newer-link", func(element *colly.HTMLElement) {
 		nextVolume = element.Attr("href")
@@ -45,19 +52,19 @@ func (a AppService) CrawVolume(nextVolume string, vol model.Volume) error {
 
 	fmt.Println(c.Title)
 	vol.ChapLink = append(vol.ChapLink, c)
-	a.CrawChapter(&c)
-	defer a.CrawVolume(nextVolume, vol)
+	CrawChapter(&c)
+	defer CrawVolume(nextVolume, vol)
 
 	return nil
 }
 
-func (a AppService) CrawChapter(chapter *model.Chapter) (error, string) {
-	if err := os.MkdirAll(config.PathPkm+chapter.Title, os.ModePerm); err != nil {
+func CrawChapter(chapter *model.Chapter) (error, string) {
+	if err := os.MkdirAll(PathPkm+chapter.Title, os.ModePerm); err != nil {
 		return err, err.Error()
 	}
 
 	for _, v := range chapter.PageLink {
-		if err := DownloadFile(v, "", config.PathPkm+chapter.Title); err != nil {
+		if err := craw_pkm.DownloadFile(v, "", PathPkm+chapter.Title); err != nil {
 			return err, err.Error()
 		}
 	}
@@ -65,7 +72,7 @@ func (a AppService) CrawChapter(chapter *model.Chapter) (error, string) {
 	return nil, "craw -> " + chapter.Title + " <- done!"
 }
 
-func (a AppService) GetPageLink(c *model.Chapter, linkPage string) error {
+func GetPageLink(c *model.Chapter, linkPage string) error {
 	collectorPKM.OnHTML("h3.post-title", func(element *colly.HTMLElement) {
 		t := strings.Trim(element.Text, "\n")
 		c.Title = t
