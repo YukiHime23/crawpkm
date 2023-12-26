@@ -43,12 +43,3 @@ func DownloadFile(URL, fileName string, pathTo string) error {
 	fmt.Println("-> download done \"" + fileName + "\" <-")
 	return nil
 }
-
-func IntInArray(arr []int, str int) bool {
-	for _, a := range arr {
-		if a == str {
-			return true
-		}
-	}
-	return false
-}
