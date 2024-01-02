@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -17,6 +18,13 @@ type Chapter struct {
 	Title    string
 	PageLink []string
 }
+
+var (
+	PathPkm     = "Pokemon/"
+	DomainPkm   = "www.pokemonspecial.com"
+	LinkPkmCraw = "https://www.pokemonspecial.com/2013/12/chapter-001.html"
+	BaseURL     = "https://www.pokemonspecial.com/2022/10/pokemon-dac-biet.html"
+)
 
 func main() {
 	collectorPKM := colly.NewCollector(
@@ -46,7 +54,16 @@ func main() {
 			}
 		})
 
-		CrawChapter(&chap)
+		if err := os.MkdirAll(PathPkm+chap.Title, os.ModePerm); err != nil {
+			log.Fatal(err)
+		}
+
+		for _, v := range chap.PageLink {
+			if err := craw_pkm.DownloadFile(v, "", PathPkm+chap.Title); err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println("craw -> " + chap.Title + " <- done!")
+		}
 
 		if err := collectorPKM.Visit(nextVolume); err != nil {
 			log.Fatal(err)
@@ -56,25 +73,4 @@ func main() {
 			break
 		}
 	}
-}
-
-var (
-	PathPkm     = "Pokemon/"
-	DomainPkm   = "www.pokemonspecial.com"
-	LinkPkmCraw = "https://www.pokemonspecial.com/2013/12/chapter-001.html"
-	BaseURL     = "https://www.pokemonspecial.com/2022/10/pokemon-dac-biet.html"
-)
-
-func CrawChapter(chapter *Chapter) (error, string) {
-	if err := os.MkdirAll(PathPkm+chapter.Title, os.ModePerm); err != nil {
-		return err, err.Error()
-	}
-
-	for _, v := range chapter.PageLink {
-		if err := craw_pkm.DownloadFile(v, "", PathPkm+chapter.Title); err != nil {
-			return err, err.Error()
-		}
-	}
-
-	return nil, "craw -> " + chapter.Title + " <- done!"
 }
