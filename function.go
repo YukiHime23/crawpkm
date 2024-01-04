@@ -1,4 +1,4 @@
-package craw_pkm
+package crawpkm
 
 import (
 	"errors"

@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	craw_pkm "github.com/YukiHime23/craw-pkm"
+	"github.com/YukiHime23/crawpkm"
 	"github.com/gocolly/colly"
 )
 
@@ -34,8 +34,8 @@ func main() {
 	var chap Chapter
 	checkEnd := false
 
-	// nextVolume := "https://www.pokemonspecial.com/2023/09/swsh-42.html"
-	nextVolume := LinkPkmCraw
+	nextVolume := "https://www.pokemonspecial.com/2014/06/chapter-021.html"
+	// nextVolume := LinkPkmCraw
 
 	for {
 		collectorPKM.OnHTML("h3.post-title.entry-title", func(e *colly.HTMLElement) {
@@ -59,7 +59,7 @@ func main() {
 		}
 
 		for _, v := range chap.PageLink {
-			if err := craw_pkm.DownloadFile(v, "", PathPkm+chap.Title); err != nil {
+			if err := crawpkm.DownloadFile(v, "", PathPkm+chap.Title); err != nil {
 				log.Fatal(err)
 			}
 			fmt.Println("craw -> " + chap.Title + " <- done!")
