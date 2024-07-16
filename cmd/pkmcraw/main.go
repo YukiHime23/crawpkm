@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/YukiHime23/crawpkm"
 	"github.com/gocolly/colly"
 )
 
@@ -26,13 +25,14 @@ var (
 	BaseURL     = "https://www.pokemonspecial.com/2022/10/pokemon-dac-biet.html"
 )
 
-func main() {
-	collectorPKM := colly.NewCollector(
-		colly.AllowedDomains(DomainPkm),
-	)
+var collectorPKM = colly.NewCollector(
+	colly.AllowedDomains(DomainPkm),
+)
 
-	var chap Chapter
+func readHTML() map[string][]string {
 
+	var title string
+	var pages []string
 	mapChap := make(map[string][]string)
 	checkEnd := false
 
@@ -40,14 +40,20 @@ func main() {
 	nextVolume := LinkPkmCraw
 
 	for {
-		collectorPKM.OnHTML("h3.post-title.entry-title", func(e *colly.HTMLElement) {
-			chap.Title = strings.Trim(e.Text, "\n")
+		collectorPKM.OnHTML("h3.post-title", func(element *colly.HTMLElement) {
+			title = strings.Trim(element.Text, "\n")
 		})
 
-		collectorPKM.OnHTML(".separator a", func(element *colly.HTMLElement) {
+		// collectorPKM.OnHTML(".separator a", func(element *colly.HTMLElement) {
+		// 	link := element.Attr("href")
+		// 	pages = append(pages, link)
+		// 	mapChap[title] = pages
+		// })
+
+		collectorPKM.OnHTML(".post-body div a", func(element *colly.HTMLElement) {
 			link := element.Attr("href")
-			chap.PageLink = append(chap.PageLink, link)
-      mapChap[chap.Title] = chap.PageLink
+			pages = append(pages, link)
+			mapChap[title] = pages
 		})
 
 		collectorPKM.OnHTML("a#Blog1_blog-pager-newer-link", func(element *colly.HTMLElement) {
@@ -66,16 +72,23 @@ func main() {
 		}
 	}
 
+	return mapChap
+}
+
+func main() {
+	mapChap := readHTML()
+
 	for k, v := range mapChap {
 		if err := os.MkdirAll(PathPkm+k, os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
 
-		for _, x := range v {
-			if err := crawpkm.DownloadFile(x, "", PathPkm+k); err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println("craw -> " + k + " <- done!")
-		}
+		fmt.Println(k)
+		fmt.Println(len(v))
+		// for _, x := range v {
+		// if err := crawpkm.DownloadFile(x, "", PathPkm+k); err != nil {
+		// 	log.Fatal(err)
+		// }
+		// }
 	}
 }
