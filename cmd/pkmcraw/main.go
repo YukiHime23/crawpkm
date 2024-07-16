@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
+	"github.com/YukiHime23/crawpkm"
 	"github.com/gocolly/colly"
 )
 
@@ -45,10 +47,7 @@ func main() {
 		collectorPKM.OnHTML(".separator a", func(element *colly.HTMLElement) {
 			link := element.Attr("href")
 			chap.PageLink = append(chap.PageLink, link)
-
-			mapChap = map[string][]string{
-				chap.Title: chap.PageLink,
-			}
+      mapChap[chap.Title] = chap.PageLink
 		})
 
 		collectorPKM.OnHTML("a#Blog1_blog-pager-newer-link", func(element *colly.HTMLElement) {
@@ -68,21 +67,15 @@ func main() {
 	}
 
 	for k, v := range mapChap {
-		// if err := os.MkdirAll(PathPkm+k, os.ModePerm); err != nil {
-		// 	log.Fatal(err)
-		// }
-
-		// for _, x := range v {
-		// 	if err := crawpkm.DownloadFile(x, "", PathPkm+k); err != nil {
-		// 		log.Fatal(err)
-		// 	}
-		// 	fmt.Println("craw -> " + k + " <- done!")
-		// }
-
-		fmt.Println(k)
+		if err := os.MkdirAll(PathPkm+k, os.ModePerm); err != nil {
+			log.Fatal(err)
+		}
 
 		for _, x := range v {
-			fmt.Println(x)
+			if err := crawpkm.DownloadFile(x, "", PathPkm+k); err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println("craw -> " + k + " <- done!")
 		}
 	}
 }
