@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 )
 
 var (
-	PathPkm     = "Pokemon/"
+	pathPkm     = "Pokemon/"
 	DomainPkm   = "www.pokemonspecial.com"
 	LinkPkmCraw = "https://www.pokemonspecial.com/2013/12/chapter-001.html"
 	BaseURL     = "https://www.pokemonspecial.com/2022/10/pokemon-dac-biet.html"
@@ -45,9 +46,18 @@ func crawHTML() {
 		collectorPKM.Visit(element.Request.AbsoluteURL(nextVolume))
 	})
 
+	absDir, err := filepath.Abs(pathPkm)
+	if err != nil {
+		fmt.Println("Error getting absolute path:", err)
+		return
+	}
+
 	collectorPKM.OnHTML("h3.post-title", func(element *colly.HTMLElement) {
 		title = strings.Trim(element.Text, "\n")
-		if err := os.MkdirAll(PathPkm+title, os.ModePerm); err != nil {
+		title = strings.ReplaceAll(title, ":", " -")
+
+		newpath := filepath.Join(absDir, title)
+		if err := os.MkdirAll(newpath, os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
 	})
@@ -61,7 +71,7 @@ func crawHTML() {
 		fmt.Println(title)
 
 		link := element.Attr("href")
-		if err := crawpkm.DownloadFile(link, "", PathPkm+title); err != nil {
+		if err := crawpkm.DownloadFile(link, "", pathPkm+title); err != nil {
 			log.Fatal(err)
 		}
 	})
