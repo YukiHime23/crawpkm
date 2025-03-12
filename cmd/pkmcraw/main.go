@@ -13,10 +13,21 @@ import (
 )
 
 var (
-	pathPkm     = "Pokemon/"
-	DomainPkm   = "www.pokemonspecial.com"
-	LinkPkmCraw = "https://www.pokemonspecial.com/2013/12/chapter-001.html"
-	BaseURL     = "https://www.pokemonspecial.com/2022/10/pokemon-dac-biet.html"
+	pathPkm   = "Pokemon/"
+	DomainPkm = "www.pokemonspecial.com"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2013/12/chapter-001.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-089.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-245.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-246.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-376.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2021/09/chapter-566.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2021/09/chapter-568.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2023/08/swsh-37.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2024/02/sv-02.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2024/12/sv-14.html"
+	LinkPkmCraw = "https://www.pokemonspecial.com/2024/11/sv-15.html"
+
+	BaseURL = "https://www.pokemonspecial.com/2022/10/pokemon-dac-biet.html"
 )
 
 var collectorPKM = colly.NewCollector(
@@ -41,7 +52,7 @@ func crawHTML() {
 		//	return
 		//}
 		// error
-		// vol 4 chap 41->51
+		// vol 4 chap 41->51, vol 7 chap 90, vol 20 chap 245, vol 34 chap 376, chap 566, 568, swsh-chap 37->43, Scarlet Violet: Chapter 2, Scarlet Violet - Chapter 14
 		//
 		collectorPKM.Visit(element.Request.AbsoluteURL(nextVolume))
 	})
@@ -55,6 +66,7 @@ func crawHTML() {
 	collectorPKM.OnHTML("h3.post-title", func(element *colly.HTMLElement) {
 		title = strings.Trim(element.Text, "\n")
 		title = strings.ReplaceAll(title, ":", " -")
+		title = strings.ReplaceAll(title, "?", "~")
 
 		newpath := filepath.Join(absDir, title)
 		if err := os.MkdirAll(newpath, os.ModePerm); err != nil {
