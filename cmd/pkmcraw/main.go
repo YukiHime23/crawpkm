@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/YukiHime23/crawpkm"
 	"github.com/gocolly/colly"
@@ -18,18 +19,29 @@ var (
 )
 
 var collectorPKM = colly.NewCollector(
-	colly.AllowedDomains(DomainPkm),
+	colly.AllowedDomains("www.pokemonspecial.com"),
+	colly.Async(true),
+	// Attach a debugger to the collector
+	colly.UserAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"),
 )
 
 func crawHTML() {
 	var title string
+	// Rotate two socks5 proxies
+	collectorPKM.Limit(&colly.LimitRule{
+		DomainGlob:  "*pokemonspecial.*",
+		Parallelism: 2,
+		Delay:       5 * time.Second,
+	})
 
 	collectorPKM.OnHTML("a#Blog1_blog-pager-newer-link", func(element *colly.HTMLElement) {
 		nextVolume := element.Attr("href")
-		fmt.Println(nextVolume)
 		//if nextVolume == "https://www.pokemonspecial.com/2014/06/chapter-004.html" {
 		//	return
 		//}
+		// error
+		// vol 4 chap 41->51
+		//
 		collectorPKM.Visit(element.Request.AbsoluteURL(nextVolume))
 	})
 
