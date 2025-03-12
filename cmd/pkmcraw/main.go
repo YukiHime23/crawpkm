@@ -10,15 +10,6 @@ import (
 	"github.com/gocolly/colly"
 )
 
-type Volume struct {
-	ChapLink []Chapter
-}
-
-type Chapter struct {
-	Title    string
-	PageLink []string
-}
-
 var (
 	PathPkm     = "Pokemon/"
 	DomainPkm   = "www.pokemonspecial.com"
@@ -30,30 +21,38 @@ var collectorPKM = colly.NewCollector(
 	colly.AllowedDomains(DomainPkm),
 )
 
-func readHTML() map[string][]string {
+func crawHTML() {
 	var title string
-	mapChap := make(map[string][]string)
 
 	collectorPKM.OnHTML("a#Blog1_blog-pager-newer-link", func(element *colly.HTMLElement) {
 		nextVolume := element.Attr("href")
 		fmt.Println(nextVolume)
+		//if nextVolume == "https://www.pokemonspecial.com/2014/06/chapter-004.html" {
+		//	return
+		//}
 		collectorPKM.Visit(element.Request.AbsoluteURL(nextVolume))
 	})
 
 	collectorPKM.OnHTML("h3.post-title", func(element *colly.HTMLElement) {
 		title = strings.Trim(element.Text, "\n")
+		if err := os.MkdirAll(PathPkm+title, os.ModePerm); err != nil {
+			log.Fatal(err)
+		}
 	})
 
 	collectorPKM.OnHTML(".separator a", func(element *colly.HTMLElement) {
-		link := element.Attr("href")
-		mapChap[title] = append(mapChap[title], link)
+		//link := element.Attr("href")
+		//mapChap[title] = append(mapChap[title], link)
 	})
 
-	// collectorPKM.OnHTML(".post-body div a", func(element *colly.HTMLElement) {
-	// 	link := element.Attr("href")
-	// 	pages = append(pages, link)
-	// 	mapChap[title] = pages
-	// })
+	collectorPKM.OnHTML(".post-body div a", func(element *colly.HTMLElement) {
+		fmt.Println(title)
+
+		link := element.Attr("href")
+		if err := crawpkm.DownloadFile(link, "", PathPkm+title); err != nil {
+			log.Fatal(err)
+		}
+	})
 
 	if err := collectorPKM.Visit(LinkPkmCraw); err != nil {
 		log.Fatal(err)
@@ -61,22 +60,8 @@ func readHTML() map[string][]string {
 
 	// Wait until threads are finished
 	collectorPKM.Wait()
-
-	return mapChap
 }
 
 func main() {
-	mapChap := readHTML()
-
-	for k, v := range mapChap {
-		if err := os.MkdirAll(PathPkm+k, os.ModePerm); err != nil {
-			log.Fatal(err)
-		}
-
-		for _, x := range v {
-			if err := crawpkm.DownloadFile(x, "", PathPkm+k); err != nil {
-				log.Fatal(err)
-			}
-		}
-	}
+	crawHTML()
 }

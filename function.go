@@ -10,7 +10,7 @@ import (
 )
 
 func DownloadFile(URL, fileName string, pathTo string) error {
-	fmt.Println("-> Start download <-")
+	//fmt.Println("-> Start download <-")
 
 	//Get the response bytes from the url
 	response, err := http.Get(URL)
