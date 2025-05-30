@@ -9,11 +9,22 @@ import (
 	"path"
 )
 
-func DownloadFile(URL, fileName string, pathTo string) error {
-	//fmt.Println("-> Start download <-")
+func generateFileName(url, nameReplace string) string {
+	ext := ".jpg"
+	fileName := path.Base(url)
+	if path.Ext(fileName) != "" {
+		return fileName
+	}
+	fmt.Println(nameReplace, ">>>>> file name", fileName)
+
+	return nameReplace + ext
+}
+
+func DownloadFile(url, nameReplace, pathTo string) error {
+	fileName := generateFileName(url, nameReplace)
 
 	//Get the response bytes from the url
-	response, err := http.Get(URL)
+	response, err := http.Get(url)
 	if err != nil {
 		return err
 	}
@@ -21,11 +32,6 @@ func DownloadFile(URL, fileName string, pathTo string) error {
 
 	if response.StatusCode != 200 {
 		return errors.New("received non 200 response code")
-	}
-
-	//Create an empty file
-	if fileName == "" {
-		fileName = path.Base(URL)
 	}
 
 	file, err := os.Create(pathTo + "/" + fileName)

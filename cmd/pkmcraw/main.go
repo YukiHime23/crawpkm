@@ -16,6 +16,7 @@ var (
 	pathPkm   = "Pokemon/"
 	DomainPkm = "www.pokemonspecial.com"
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2013/12/chapter-001.html"
+	LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-048.html"
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-089.html"
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-245.html"
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-246.html"
@@ -25,7 +26,7 @@ var (
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2023/08/swsh-37.html"
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2024/02/sv-02.html"
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2024/12/sv-14.html"
-	LinkPkmCraw = "https://www.pokemonspecial.com/2024/11/sv-15.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2024/11/sv-15.html"
 
 	BaseURL = "https://www.pokemonspecial.com/2022/10/pokemon-dac-biet.html"
 )
@@ -39,6 +40,7 @@ var collectorPKM = colly.NewCollector(
 
 func crawHTML() {
 	var title string
+	var i int
 	// Rotate two socks5 proxies
 	collectorPKM.Limit(&colly.LimitRule{
 		DomainGlob:  "*pokemonspecial.*",
@@ -48,12 +50,13 @@ func crawHTML() {
 
 	collectorPKM.OnHTML("a#Blog1_blog-pager-newer-link", func(element *colly.HTMLElement) {
 		nextVolume := element.Attr("href")
-		//if nextVolume == "https://www.pokemonspecial.com/2014/06/chapter-004.html" {
-		//	return
-		//}
-		// error
-		// vol 4 chap 41->51, vol 7 chap 90, vol 20 chap 245, vol 34 chap 376, chap 566, 568, swsh-chap 37->43, Scarlet Violet: Chapter 2, Scarlet Violet - Chapter 14
+		if nextVolume == "https://www.pokemonspecial.com/2014/06/chapter-053.html" {
+			return
+		}
+		// error vol 4 chap 48 while craw from chap 41 to 53
+		//vol 7 chap 90, vol 20 chap 245, vol 34 chap 376, chap 566, 568, swsh-chap 37->43, Scarlet Violet: Chapter 2, Scarlet Violet - Chapter 14
 		//
+		i = 0
 		collectorPKM.Visit(element.Request.AbsoluteURL(nextVolume))
 	})
 
@@ -80,10 +83,9 @@ func crawHTML() {
 	})
 
 	collectorPKM.OnHTML(".post-body div a", func(element *colly.HTMLElement) {
-		fmt.Println(title)
-
 		link := element.Attr("href")
-		if err := crawpkm.DownloadFile(link, "", pathPkm+title); err != nil {
+		i++
+		if err := crawpkm.DownloadFile(link, fmt.Sprintf("%d", i), pathPkm+title); err != nil {
 			log.Fatal(err)
 		}
 	})
