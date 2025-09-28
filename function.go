@@ -1,9 +1,11 @@
 package crawpkm
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -48,4 +50,16 @@ func DownloadFile(url, nameReplace, pathTo string) error {
 
 	fmt.Println("-> download done \"" + fileName + "\" <-")
 	return nil
+}
+
+func SaveToJSON(data interface{}, filename string) {
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		log.Fatalf("Error marshaling to JSON: %v", err)
+	}
+
+	err = os.WriteFile(filename, jsonData, 0644)
+	if err != nil {
+		log.Fatalf("Error writing to file: %v", err)
+	}
 }

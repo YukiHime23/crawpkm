@@ -8,15 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/YukiHime23/crawpkm"
 	"github.com/gocolly/colly"
 )
 
 var (
-	pathPkm   = "Pokemon/"
-	DomainPkm = "www.pokemonspecial.com"
-	// LinkPkmCraw = "https://www.pokemonspecial.com/2013/12/chapter-001.html"
-	LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-048.html"
+	pathPkm     = "Pokemon/"
+	DomainPkm   = "www.pokemonspecial.com"
+	LinkPkmCraw = "https://www.pokemonspecial.com/2013/12/chapter-001.html"
+	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-048.html"
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-089.html"
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-245.html"
 	// LinkPkmCraw = "https://www.pokemonspecial.com/2014/06/chapter-246.html"
@@ -50,9 +49,9 @@ func crawHTML() {
 
 	collectorPKM.OnHTML("a#Blog1_blog-pager-newer-link", func(element *colly.HTMLElement) {
 		nextVolume := element.Attr("href")
-		if nextVolume == "https://www.pokemonspecial.com/2014/06/chapter-053.html" {
-			return
-		}
+		// if nextVolume == "https://www.pokemonspecial.com/2014/06/chapter-002.html" {
+		// 	return
+		// }
 		// error vol 4 chap 48 while craw from chap 41 to 53
 		//vol 7 chap 90, vol 20 chap 245, vol 34 chap 376, chap 566, 568, swsh-chap 37->43, Scarlet Violet: Chapter 2, Scarlet Violet - Chapter 14
 		//
@@ -75,6 +74,14 @@ func crawHTML() {
 		if err := os.MkdirAll(newpath, os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
+
+		// Save title to a text file
+		titleFilePath := filepath.Join(newpath, "title.txt")
+		if err := os.WriteFile(titleFilePath, []byte(title), 0644); err != nil {
+			log.Printf("Error saving title to file: %v", err)
+		} else {
+			fmt.Printf("Title saved to %s\n", titleFilePath)
+		}
 	})
 
 	collectorPKM.OnHTML(".separator a", func(element *colly.HTMLElement) {
@@ -83,11 +90,11 @@ func crawHTML() {
 	})
 
 	collectorPKM.OnHTML(".post-body div a", func(element *colly.HTMLElement) {
-		link := element.Attr("href")
+		// link := element.Attr("href")
 		i++
-		if err := crawpkm.DownloadFile(link, fmt.Sprintf("%d", i), pathPkm+title); err != nil {
-			log.Fatal(err)
-		}
+		// if err := crawpkm.DownloadFile(link, fmt.Sprintf("%d", i), pathPkm+title); err != nil {
+		// 	log.Fatal(err)
+		// }
 	})
 
 	if err := collectorPKM.Visit(LinkPkmCraw); err != nil {
